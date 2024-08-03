@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY /app .
 
-RUN cd app/
+WORKDIR /app
 
 RUN gradle installDist
 
