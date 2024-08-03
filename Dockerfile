@@ -16,7 +16,7 @@ ENV PATH=$PATH:$GRADLE_HOME/bin
 
 WORKDIR /app
 
-RUN build
+RUN ./gradlew clean build
 
 EXPOSE 7070
 
