@@ -1,20 +1,25 @@
 FROM eclipse-temurin:21-jdk
 
-WORKDIR /app/app
+ARG GRADLE_VERSION=8.5
 
-COPY gradle gradle
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY gradlew .
+RUN apt-get update && apt-get install -yq unzip
 
-RUN ./gradlew --no-daemon dependencies
+RUN wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
+    && unzip gradle-${GRADLE_VERSION}-bin.zip \
+    && rm gradle-${GRADLE_VERSION}-bin.zip
 
-COPY src src
-COPY config config
+ENV GRADLE_HOME=/opt/gradle
 
-RUN ./gradlew --no-daemon build
+RUN mv gradle-${GRADLE_VERSION} ${GRADLE_HOME}
 
-ENV JAVA_OPTS "-Xmx512M -Xms512M"
-EXPOSE 7070
+ENV PATH=$PATH:$GRADLE_HOME/bin
 
-CMD java -jar build/libs/app-1.0-SNAPSHOT-all.jar
+WORKDIR /app
+
+COPY /app .
+
+RUN cd app/
+
+RUN gradle installDist
+
+CMD ./build/install/java-javalin-blog/bin/java-javalin-blog
