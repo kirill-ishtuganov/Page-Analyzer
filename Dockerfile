@@ -16,7 +16,9 @@ ENV PATH=$PATH:$GRADLE_HOME/bin
 
 WORKDIR /app
 
-RUN ./gradlew clean build
+COPY ./ ./
+
+RUN gradle installDist
 
 EXPOSE 7070
 
