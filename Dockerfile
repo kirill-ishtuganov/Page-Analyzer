@@ -12,7 +12,7 @@ ENV GRADLE_HOME=/opt/gradle
 
 RUN mv gradle-${GRADLE_VERSION} ${GRADLE_HOME}
 
-WORKDIR /app/java-project-72/app
+WORKDIR /app/app
 
 COPY ./ ./
 
