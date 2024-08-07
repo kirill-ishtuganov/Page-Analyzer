@@ -9,20 +9,20 @@ import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.stream.Collectors;
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
 
 public class App {
 
-    public static Javalin getApp() {
-
-        var app = Javalin.create(config -> {
-            config.bundledPlugins.enableDevLogging();
-            config.fileRenderer(new JavalinJte());
-        });
-        return app;
+    public static void main(String[] args) throws Exception {
+        var app = getApp();
+        app.start(7070);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static Javalin getApp() throws SQLException {
 
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
@@ -38,10 +38,20 @@ public class App {
         }
         BaseRepository.dataSource = dataSource;
 
-        var app = getApp();
+        var app = Javalin.create(config -> {
+            config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte(createTemplateEngine()));
+        });
 
         app.get(NamedRoutes.mainPath(), RootController::index);
 
-        app.start(7070);
+        return app;
+    }
+
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        return templateEngine;
     }
 }
