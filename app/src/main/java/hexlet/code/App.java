@@ -20,13 +20,19 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         var app = getApp();
-        app.start(7070);
+        app.start(getPort());
+    }
+
+    private static int getPort() {
+        String port = System.getenv().getOrDefault("PORT", "7070");
+        return Integer.parseInt(port);
     }
 
     public static Javalin getApp() throws SQLException {
 
         var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:h2:mem:hexlet_project;DB_CLOSE_DELAY=-1;");
+        var dataBase = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:Url");
+        hikariConfig.setJdbcUrl(dataBase + ";DB_CLOSE_DELAY=-1;");
 
         var dataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
@@ -44,6 +50,8 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
+        app.before(ctx -> ctx.contentType("text/html; charset=utf-8"));
+
         app.get(NamedRoutes.mainPath(), RootController::index);
 
         app.post(NamedRoutes.urlsPath(), URLController::create);
@@ -56,7 +64,6 @@ public class App {
     private static TemplateEngine createTemplateEngine() {
         ClassLoader classLoader = App.class.getClassLoader();
         ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
-        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
-        return templateEngine;
+        return TemplateEngine.create(codeResolver, ContentType.Html);
     }
 }

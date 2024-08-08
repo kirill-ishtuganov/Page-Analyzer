@@ -1,10 +1,31 @@
 @import hexlet.code.dto.urls.UrlPage
+@import hexlet.code.dto.BasePage
 @param UrlPage page
 
 @template.layout.page(
+page = new BasePage(),
 content = @`
-        <a>${page.getUrl().getId()}</a>
-        <a>${page.getUrl().getName()}</a>
-        <a>${page.getUrl().getCreatedAt().toString()}</a>
+        <section>
+                <div class="container-lg mt-5">
+                        <h1>Сайт: ${page.getUrl().getName()}</h1>
+
+                        <table class="table table-bordered table-hover mt-3">
+                                <tbody>
+                                <tr>
+                                        <td>ID</td>
+                                        <td>${page.getUrl().getId()}</td>
+                                </tr>
+                                <tr>
+                                        <td>Имя</td>
+                                        <td>${page.getUrl().getName()}</td>
+                                </tr>
+                                <tr>
+                                        <td>Дата создания</td>
+                                        <td></td>
+                                </tr>
+                                </tbody>
+                        </table>
+                </div>
+        </section>
     `
 )

@@ -3,21 +3,38 @@
 @param UrlsPage page
 
 @template.layout.page(
+    page = page,
 content = @`
-    <table class="table table-striped">
-        @for(var url : page.getUrls())
+    <div class="container-lg mt 5">
+        <h1>Сайты</h1>
+        <table class="table table-bordered table-hover mt-3">
+            <thead>
             <tr>
-                <td>
-                    <a>${url.getId()}</a>
-                </td>
-                <td>
-                    <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
-                </td>
-                <td>
-                    <a>${url.getCreatedAt().toString()}</a>
-                </td>
+                <th class="col-1">ID</th>
+                <th>Имя</th>
+                <th class="col-2">Последняя проверка</th>
+                <th class="col-1">Код ответа</th>
             </tr>
-        @endfor
-    </table>
+            </thead>
+            <tbody>
+                @for(var url : page.getUrls())
+                    <tr>
+                        <td>
+                            <a>${url.getId()}</a>
+                        </td>
+                        <td>
+                            <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                @endfor
+            </tbody>
+        </table>
+    </div>
     `
 )

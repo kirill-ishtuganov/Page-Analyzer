@@ -1,9 +1,8 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,14 +35,18 @@ public class UrlRepository extends BaseRepository {
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
-            var resultSet = stmt.executeQuery();
-            var name = resultSet.getString("name");
-            var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
-            var url = new Url(name);
-            url.setId(id);
-            url.setCreatedAt(createdAt);
-            return url;
+            try (var resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    var name = resultSet.getString("name");
+                    var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
+                    var url = new Url(name);
+                    url.setId(id);
+                    url.setCreatedAt(createdAt);
+                    return url;
+                }
+            }
         }
+        return null;
     }
 
     public static Optional<Url> search(String term) throws SQLException {
@@ -66,6 +69,17 @@ public class UrlRepository extends BaseRepository {
         }
     }
 
+    public static boolean existsByName(String name) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM urls WHERE name = ?";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            try (var resultSet = stmt.executeQuery()) {
+                resultSet.next();
+                return resultSet.getInt(1) > 0;
+            }
+        }
+    }
 
     public static List<Url> getEntities() throws SQLException {
         var sql = "SELECT * FROM urls";

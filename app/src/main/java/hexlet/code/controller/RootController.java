@@ -9,7 +9,7 @@ public class RootController {
 
         String flashType = ctx.consumeSessionAttribute("flashType");
         String flash = ctx.consumeSessionAttribute("flash");
-        var page = new BasePage(flashType, flash);
+        var page = flash == null ? new BasePage() : new BasePage(flashType, flash);
         ctx.render("index.jte", model("page", page));
     }
 }
