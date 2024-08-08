@@ -1,24 +1,30 @@
 package hexlet.code;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controller.RootController;
 import hexlet.code.controller.URLController;
-import hexlet.code.repository.BaseRepository;
+import hexlet.code.utils.DatabaseConfig;
 import hexlet.code.utils.NamedRoutes;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
+import java.sql.Statement;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
 
 public class App {
 
-    public static void main(String[] args) throws Exception {
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static final DataSource DATA_SOURCE = DatabaseConfig.getDataSource();
+
+    public static void main(String[] args) {
+        initializeDatabase();
         var app = getApp();
         app.start(getPort());
     }
@@ -28,23 +34,7 @@ public class App {
         return Integer.parseInt(port);
     }
 
-    public static Javalin getApp() throws SQLException {
-
-        var hikariConfig = new HikariConfig();
-        var dataBase = System.getenv().getOrDefault("JDBC_DATABASE_URL",
-                "jdbc:h2:mem:Url;DB_CLOSE_DELAY=-1;");
-        hikariConfig.setJdbcUrl(dataBase);
-
-        var dataSource = new HikariDataSource(hikariConfig);
-        var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
-        var sql = new BufferedReader(new InputStreamReader(url))
-                .lines().collect(Collectors.joining("\n"));
-
-        try (var connection = dataSource.getConnection();
-             var statement = connection.createStatement()) {
-            statement.execute(sql);
-        }
-        BaseRepository.dataSource = dataSource;
+    public static Javalin getApp()  {
 
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
@@ -60,6 +50,22 @@ public class App {
         app.get(NamedRoutes.urlPath(), URLController::show);
 
         return app;
+    }
+
+    static void initializeDatabase() {
+        try (Connection conn = DATA_SOURCE.getConnection();
+             Statement stmt = conn.createStatement();
+             var resourceStream = App.class.getResourceAsStream("/schema.sql")) {
+
+            if (resourceStream == null) {
+                throw new IOException("Resource /schema.sql not found");
+            }
+            String sql = new String(resourceStream.readAllBytes());
+            stmt.execute(sql);
+
+        } catch (SQLException | IOException e) {
+            LOGGER.error("Error initializing the database", e);
+        }
     }
 
     private static TemplateEngine createTemplateEngine() {
