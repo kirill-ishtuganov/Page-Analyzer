@@ -15,31 +15,43 @@
         <title>Анализатор страниц</title>
     </head>
     <body>
-        <div class="b-example-divider"></div>
 
-        <div class="container">
-            <header class="d-flex justify-content-center py-3">
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="${NamedRoutes.mainPath()}" class="nav-link active">Главная</a></li>
-                </ul>
-            </header>
-        </div>
-        @if(page != null && page.getFlash() != null)
-            <p>${page.getFlash()}</p>
+        <nav class="navbar navbar-expand navbar-dark bg-dark" aria-label="Second navbar example">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse" id="navbarsExample02">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="${NamedRoutes.mainPath()}">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="${NamedRoutes.urlsPath()}">Сайты</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow-1">
+
+            @if(page != null && page.getFlash() != null)
+                <div class="alert alert-${page.getFlashType()}" role="alert">
+                    <p>${page.getFlash()}</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
-        <div>
-            ${content}
-        </div>
 
-        <div class="container">
-            <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-                <div class="col-md-4 d-flex align-items-center">
-                    <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
-                        <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"/></svg>
-                    </a>
-                    <a href="https://github.com/kirill-ishtuganov" class="text-muted">My GitHub</a>
+            <section>
+                ${content}
+            </section>
+        </main>
+
+            <footer class="footer border-top py-3 mt-5 bg-light">
+                <div class="container-xl">
+                    <div class="text-center">
+                        Ссылка на мой GitHub
+                        <a href="https://github.com/kirill-ishtuganov" target="_blank">kirill-ishtuganov</a>
+                    </div>
                 </div>
             </footer>
-        </div>
     </body>
 </html>
