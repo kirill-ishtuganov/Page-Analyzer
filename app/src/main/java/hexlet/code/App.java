@@ -21,6 +21,7 @@ import gg.jte.resolve.ResourceCodeResolver;
 public class App {
 
     public static void main(String[] args) throws SQLException {
+
         var app = getApp();
         app.start(getPort());
     }
@@ -34,7 +35,8 @@ public class App {
 
         var databaseConfig = System.getenv().getOrDefault("JDBC_DATABASE_URL",
                 "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-        var hikariConfig = new HikariConfig(databaseConfig);
+        var hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
 
         var dataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
