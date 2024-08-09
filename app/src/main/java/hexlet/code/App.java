@@ -39,10 +39,11 @@ public class App {
         hikariConfig.setJdbcUrl(databaseConfig);
 
         var dataSource = new HikariDataSource(hikariConfig);
-        var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
-        var sql = new BufferedReader(new InputStreamReader(url))
+        var schemaUrl = App.class.getClassLoader().getResourceAsStream("schema.sql");
+        var sql = new BufferedReader(new InputStreamReader(schemaUrl))
                 .lines().collect(Collectors.joining("\n"));
 
+        // log.info(sql);
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(sql);
