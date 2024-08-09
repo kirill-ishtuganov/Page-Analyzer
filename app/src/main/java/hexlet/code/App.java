@@ -32,10 +32,9 @@ public class App {
 
     public static Javalin getApp() throws SQLException {
 
-        var hikariConfig = new HikariConfig();
         var databaseConfig = System.getenv().getOrDefault("JDBC_DATABASE_URL",
                 "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-        hikariConfig.setJdbcUrl(databaseConfig);
+        var hikariConfig = new HikariConfig(databaseConfig);
 
         var dataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResourceAsStream("schema.sql");
