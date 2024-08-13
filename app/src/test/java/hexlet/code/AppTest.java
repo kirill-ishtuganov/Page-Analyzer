@@ -101,7 +101,7 @@ public class AppTest {
 
     @Test
     public void testCheckUrl() throws SQLException {
-        var urlName = mockServer.url(NamedRoutes.rootPath()).toString();
+        var urlName = mockServer.url("/").toString();
         var url = new Url(urlName);
         url.setCreatedAt(LocalDateTime.now());
         UrlRepository.save(url);
