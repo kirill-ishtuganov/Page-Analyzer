@@ -3,6 +3,7 @@ package hexlet.code.controller;
 import hexlet.code.dto.urls.UrlPage;
 import hexlet.code.dto.urls.UrlsPage;
 import hexlet.code.model.Url;
+import hexlet.code.repository.CheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.utils.NamedRoutes;
 import io.javalin.http.Context;
@@ -26,7 +27,7 @@ public class URLController {
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flashType", "danger");
-            ctx.redirect(NamedRoutes.mainPath());
+            ctx.redirect(NamedRoutes.rootPath());
             return;
         }
 
@@ -35,7 +36,7 @@ public class URLController {
         if (UrlRepository.findName(name).isPresent()) {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flashType", "info");
-            ctx.redirect(NamedRoutes.mainPath());
+            ctx.redirect(NamedRoutes.rootPath());
         } else {
             UrlRepository.save(urlObj);
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
@@ -59,8 +60,12 @@ public class URLController {
             if (url == null) {
                 throw new NotFoundResponse("Url not found");
             }
-            var page = new UrlPage(url);
+            var checks = CheckRepository.findAllCheck(id);
+            var page = new UrlPage(url, checks);
+            page.setFlashType(ctx.consumeSessionAttribute("flashType"));
+            page.setFlash(ctx.consumeSessionAttribute("flash"));
             ctx.render("urls/show.jte", model("page", page));
+
         } catch (SQLException e) {
             ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный id");

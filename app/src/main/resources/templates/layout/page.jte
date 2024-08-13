@@ -5,7 +5,7 @@
 @param BasePage page
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,7 +22,7 @@
             <div class="container-fluid">
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <div class="navbar-nav">
-                        <a class="nav-link" href="${NamedRoutes.mainPath()}">Главная</a>
+                        <a class="nav-link" href="${NamedRoutes.rootPath()}">Главная</a>
                         <a class="nav-link" href="${NamedRoutes.urlsPath()}">Сайты</a>
                     </div>
                 </div>

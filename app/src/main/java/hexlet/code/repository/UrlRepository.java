@@ -1,6 +1,7 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -82,7 +83,10 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static List<Url> getEntities() throws SQLException {
-        var sql = "SELECT * FROM urls";
+        var sql = "SELECT id, name,(SELECT status_code FROM url_checks "
+                + "WHERE url_checks.url_id = urls.id ORDER BY id DESC LIMIT 1) AS status_code,"
+                + "(SELECT created_at FROM url_checks "
+                + "WHERE url_checks.url_id = urls.id ORDER BY id DESC LIMIT 1) AS last FROM urls";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
@@ -90,11 +94,17 @@ public class UrlRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
-
+                var statusCode = resultSet.getInt("status_code");
+                var last = resultSet.getTimestamp("last");
                 var url = new Url(name);
+                if (statusCode != 0) {
+                    UrlCheck urlCheck = new UrlCheck();
+                    urlCheck.setUrlId(id);
+                    urlCheck.setStatusCode(statusCode);
+                    urlCheck.setCreatedAt(last.toLocalDateTime());
+                    url.setLastCheck(urlCheck);
+                }
                 url.setId(id);
-                url.setCreatedAt(createdAt);
                 result.add(url);
             }
             return result;
