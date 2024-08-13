@@ -7,34 +7,40 @@ import hexlet.code.repository.UrlRepository;
 import hexlet.code.utils.NamedRoutes;
 import io.javalin.http.Context;
 
+import java.net.URI;
+import java.net.URL;
 import java.sql.SQLException;
+import io.javalin.http.NotFoundResponse;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class URLController {
 
-    public static void create(Context ctx) {
+    public static void create(Context ctx) throws SQLException {
 
+        var inputUrl = ctx.formParam("url");
+        URL parsedUrl;
         try {
-            String inputUrl = ctx.formParam("url");
-            java.net.URL url = new java.net.URL(inputUrl);
-            String domainUrl = url.getProtocol() + "://" + url.getHost() + (url.getPort() == -1 ? "" : ":"
-                    + url.getPort());
-            if (UrlRepository.existsByName(domainUrl)) {
-                ctx.sessionAttribute("flashType", "info");
-                ctx.sessionAttribute("flash", "Страница уже существует");
-                ctx.redirect(NamedRoutes.mainPath());
-                return;
-            }
-
-            UrlRepository.save(new Url(domainUrl));
-            ctx.sessionAttribute("flashType", "success");
-            ctx.sessionAttribute("flash", "Страница успешно добавлена");
-            ctx.redirect(NamedRoutes.urlsPath());
+            var uri = new URI(inputUrl);
+            parsedUrl = uri.toURL();
         } catch (Exception e) {
-            ctx.sessionAttribute("flashType", "danger");
             ctx.sessionAttribute("flash", "Некорректный URL");
+            ctx.sessionAttribute("flashType", "danger");
             ctx.redirect(NamedRoutes.mainPath());
+            return;
+        }
+
+        var name = parsedUrl.getProtocol() + "://" + parsedUrl.getAuthority();
+        var urlObj = new Url(name);
+        if (UrlRepository.findName(name).isPresent()) {
+            ctx.sessionAttribute("flash", "Страница уже существует");
+            ctx.sessionAttribute("flashType", "info");
+            ctx.redirect(NamedRoutes.mainPath());
+        } else {
+            UrlRepository.save(urlObj);
+            ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.sessionAttribute("flashType", "success");
+            ctx.redirect(NamedRoutes.urlsPath());
         }
     }
 
@@ -50,6 +56,9 @@ public class URLController {
         try {
             var id = ctx.pathParamAsClass("id", Long.class).get();
             var url = UrlRepository.find(id);
+            if (url == null) {
+                throw new NotFoundResponse("Url not found");
+            }
             var page = new UrlPage(url);
             ctx.render("urls/show.jte", model("page", page));
         } catch (SQLException e) {

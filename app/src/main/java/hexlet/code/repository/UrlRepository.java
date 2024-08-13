@@ -13,19 +13,17 @@ import java.util.Optional;
 public class UrlRepository extends BaseRepository {
 
     public static void save(Url url) throws SQLException {
+
         var sql = "INSERT INTO urls (name, created_at) VALUES (?, ?)";
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, url.getName());
-            var createdAt = LocalDateTime.now();
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(createdAt));
-
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
             preparedStatement.executeUpdate();
+
             var generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 url.setId(generatedKeys.getLong(1));
-                url.setCreatedAt(createdAt);
-
             } else {
                 throw new SQLException("DB have not returned an id after saving an entity");
             }
@@ -51,20 +49,20 @@ public class UrlRepository extends BaseRepository {
         return null;
     }
 
-    public static Optional<Url> search(String term) throws SQLException {
+    public static Optional<Url> findName(String name) throws SQLException {
 
         var sql = "SELECT * FROM urls WHERE name = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, term);
+            stmt.setString(1, name);
             var resultSet = stmt.executeQuery();
+
             if (resultSet.next()) {
                 var id = resultSet.getLong("id");
-                var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
-
-                var url = new Url(term);
+                var created = resultSet.getTimestamp("created_at");
+                var url = new Url(name);
+                url.setCreatedAt(created.toLocalDateTime());
                 url.setId(id);
-                url.setCreatedAt(createdAt);
                 return Optional.of(url);
             }
             return Optional.empty();
