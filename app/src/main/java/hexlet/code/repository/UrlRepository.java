@@ -102,7 +102,6 @@ public class UrlRepository extends BaseRepository {
                     urlCheck.setUrlId(id);
                     urlCheck.setStatusCode(statusCode);
                     urlCheck.setCreatedAt(last.toLocalDateTime());
-                    url.setLastCheck(urlCheck);
                 }
                 url.setId(id);
                 result.add(url);

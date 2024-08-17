@@ -47,7 +47,8 @@ public class URLController {
 
     public static void index(Context ctx) throws SQLException {
 
-        var page = new UrlsPage(UrlRepository.getEntities());
+        var urls = UrlRepository.getEntities();
+        var page = new UrlsPage(urls, CheckRepository.getLastChecks(urls));
         page.setFlashType(ctx.consumeSessionAttribute("flashType"));
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("urls/index.jte", model("page", page));

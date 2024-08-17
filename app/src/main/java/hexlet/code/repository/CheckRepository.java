@@ -1,5 +1,6 @@
 package hexlet.code.repository;
 
+import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 
 import java.sql.SQLException;
@@ -7,8 +8,9 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 public class CheckRepository extends BaseRepository {
 
@@ -52,6 +54,17 @@ public class CheckRepository extends BaseRepository {
             }
             return result;
         }
+    }
+
+    public static Map<Long, UrlCheck> getLastChecks(List<Url> urls) throws SQLException {
+
+        Map<Long, UrlCheck> result = new HashMap<>();
+        for (var url : urls) {
+            var lastChecks = CheckRepository.findAllCheck(url.getId());
+            var lastCheck = lastChecks.isEmpty() ? null : lastChecks.getLast();
+            result.put(url.getId(), lastCheck);
+        }
+        return result;
     }
 
 }

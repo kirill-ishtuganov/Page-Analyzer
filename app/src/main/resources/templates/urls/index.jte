@@ -24,15 +24,23 @@
                                                         <a>${url.getId()}</a>
                                                 </td>
                                                 <td>
-                                                        <a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a>
+                                                        <a href="${NamedRoutes.urlPath(url.getId())}">
+                                                                ${url.getName()}
+                                                        </a>
                                                 </td>
                                                 <td>
-                                                        <a>${url.getLastCheck() == null ? "" :
-                                                            Formatter.dateToString(url.getLastCheck().getCreatedAt())}</a>
+                                                        <a>${page.getLastUrlChecks().get(url.getId()) == null ? "" :
+                                                            Formatter.dateToString(
+                                                                    page.getLastUrlChecks().get(url.getId())
+                                                                    .getCreatedAt())}
+                                                        </a>
                                                 </td>
                                                 <td>
-                                                        <a>${url.getLastCheck() == null ? "" :
-                                                            String.valueOf(url.getLastCheck().getStatusCode())}</a>
+                                                        <a>${page.getLastUrlChecks().get(url.getId()) == null ? "" :
+                                                            String.valueOf(
+                                                                    page.getLastUrlChecks().get(url.getId())
+                                                                    .getStatusCode())}
+                                                        </a>
                                                 </td>
                                         </tr>
                                 @endfor
