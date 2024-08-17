@@ -60,8 +60,8 @@ public class CheckRepository extends BaseRepository {
 
         Map<Long, UrlCheck> result = new HashMap<>();
         for (var url : urls) {
-            var lastChecks = CheckRepository.findAllCheck(url.getId());
-            var lastCheck = lastChecks.isEmpty() ? null : lastChecks.getLast();
+            var checks = CheckRepository.findAllCheck(url.getId());
+            var lastCheck = checks.isEmpty() ? null : checks.getLast();
             result.put(url.getId(), lastCheck);
         }
         return result;
