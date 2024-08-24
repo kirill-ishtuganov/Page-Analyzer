@@ -37,15 +37,11 @@ public class AppTest {
         app = App.getApp();
     }
 
-    private static String getFile() throws IOException {
-        return Files.readString(PATH);
-    }
-
     @BeforeAll
     static void generalSetUp() throws Exception {
         mockServer = new MockWebServer();
         MockResponse mockResponse = new MockResponse()
-                .setBody(getFile())
+                .setBody(Files.readString(PATH))
                 .setResponseCode(200);
         mockServer.enqueue(mockResponse);
         mockServer.start();
@@ -69,7 +65,6 @@ public class AppTest {
     public void testUrlsPage() {
         JavalinTest.test(app, (server, client) -> {
             var url = new Url("https://www.doodle.com");
-            url.setCreatedAt(LocalDateTime.now());
             UrlRepository.save(url);
             var response = client.get("/urls");
             assertThat(response.code()).isEqualTo(200);

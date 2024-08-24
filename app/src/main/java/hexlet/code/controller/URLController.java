@@ -48,7 +48,7 @@ public class URLController {
     public static void index(Context ctx) throws SQLException {
 
         var urls = UrlRepository.getEntities();
-        var page = new UrlsPage(urls, CheckRepository.getLastChecks(urls));
+        var page = new UrlsPage(urls, CheckRepository.getLastUrlsCheck());
         page.setFlashType(ctx.consumeSessionAttribute("flashType"));
         page.setFlash(ctx.consumeSessionAttribute("flash"));
         ctx.render("urls/index.jte", model("page", page));
@@ -69,7 +69,7 @@ public class URLController {
 
         } catch (SQLException e) {
             ctx.sessionAttribute("flashType", "danger");
-            ctx.sessionAttribute("flash", "Некорректный id");
+            ctx.sessionAttribute("flash", "Ошибка БД");
             ctx.redirect(NamedRoutes.urlsPath());
         }
     }
