@@ -56,7 +56,7 @@ public class CheckRepository extends BaseRepository {
     }
 
     public static Map<Long, UrlCheck> getLastUrlsCheck() throws SQLException {
-        var sql = "SELECT url_id, status_code, MAX(created_at) as created_at "
+        var sql = "SELECT url_id, status_code, MAX(created_at) AS created_at "
                 + "FROM url_checks GROUP BY url_id, status_code";
         try (var conn = dataSource.getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
